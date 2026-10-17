@@ -165,21 +165,17 @@ export const Navbar = ({ onOpenAdmin, onOpenQuoteDrawer, onOpenRateSheet }) => {
               )}
             </button>
 
-            {/* Admin Management Button */}
-            <button
-              onClick={onOpenAdmin}
-              className={`p-2.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-semibold ${
-                isAdminLoggedIn
-                  ? 'bg-amber-50 border-amber-300 text-amber-800'
-                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-              }`}
-              title={isAdminLoggedIn ? 'Admin Panel Active' : 'Owner / Admin Login'}
-            >
-              <ShieldCheck className={`w-4 h-4 ${isAdminLoggedIn ? 'text-amber-600' : 'text-slate-500'}`} />
-              <span className="hidden sm:inline">
-                {isAdminLoggedIn ? 'Manager' : 'Admin'}
-              </span>
-            </button>
+            {/* Admin Management Button (Visible ONLY when logged in) */}
+            {isAdminLoggedIn && (
+              <button
+                onClick={onOpenAdmin}
+                className="p-2.5 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 transition-all flex items-center gap-1.5 text-xs font-semibold cursor-pointer shadow-sm animate-pulse-subtle"
+                title="Owner Manager Active"
+              >
+                <ShieldCheck className="w-4 h-4 text-amber-600" />
+                <span className="hidden sm:inline">Manager Mode</span>
+              </button>
+            )}
 
             {/* Direct WhatsApp CTA Button */}
             <a

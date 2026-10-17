@@ -16,7 +16,8 @@ import {
   Lightbulb, 
   Flame,
   CheckCircle,
-  HelpCircle
+  HelpCircle,
+  FileText
 } from 'lucide-react';
 
 export const SolarCalculator = () => {

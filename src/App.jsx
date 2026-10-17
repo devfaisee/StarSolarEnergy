@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from './context/StoreContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -25,6 +25,25 @@ export function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isRateSheetOpen, setIsRateSheetOpen] = useState(false);
   const [isQuoteDrawerOpen, setIsQuoteDrawerOpen] = useState(false);
+
+  // Discreet URL Hash #admin detection
+  useEffect(() => {
+    const checkHash = () => {
+      if (window.location.hash === '#admin') {
+        setIsAdminOpen(true);
+      }
+    };
+    checkHash();
+    window.addEventListener('hashchange', checkHash);
+    return () => window.removeEventListener('hashchange', checkHash);
+  }, []);
+
+  const handleCloseAdmin = () => {
+    setIsAdminOpen(false);
+    if (window.location.hash === '#admin') {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col relative selection:bg-amber-400 selection:text-slate-950 font-sans">
@@ -87,7 +106,7 @@ export function App() {
 
       {/* Admin Management Portal */}
       {isAdminOpen && (
-        <AdminPortal onClose={() => setIsAdminOpen(false)} />
+        <AdminPortal onClose={handleCloseAdmin} />
       )}
 
       {/* Daily Solar Rate Sheet Modal */}

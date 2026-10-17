@@ -9,7 +9,8 @@ import {
   Mail, 
   ShieldCheck, 
   ArrowUp,
-  Heart
+  Heart,
+  Lock
 } from 'lucide-react';
 
 export const Footer = ({ onOpenAdmin, onOpenRateSheet }) => {
@@ -75,17 +76,11 @@ export const Footer = ({ onOpenAdmin, onOpenRateSheet }) => {
                 href={formatWhatsAppUrl('Hello StarSolarEnergy!')}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3.5 py-2 rounded-xl bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-600/30 transition-colors flex items-center gap-2"
+                className="px-4 py-2 rounded-xl bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-600/30 transition-colors flex items-center gap-2"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>WhatsApp Consultation</span>
               </a>
-              <button
-                onClick={onOpenAdmin}
-                className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 text-xs font-medium transition-colors"
-              >
-                Owner Portal
-              </button>
             </div>
           </div>
 
@@ -188,7 +183,17 @@ export const Footer = ({ onOpenAdmin, onOpenRateSheet }) => {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} {settings.shopName}. All rights reserved.</p>
+          <div className="flex items-center gap-2">
+            <p>© {new Date().getFullYear()} {settings.shopName}. All rights reserved.</p>
+            <button
+              onClick={onOpenAdmin}
+              className="text-slate-800 hover:text-slate-500 transition-colors p-1"
+              title="Staff Access"
+              aria-label="Staff Access"
+            >
+              <Lock className="w-3 h-3 opacity-60" />
+            </button>
+          </div>
           <div className="flex items-center gap-4">
             <button
               onClick={scrollToTop}

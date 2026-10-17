@@ -76,10 +76,50 @@ export const AdminPortal = ({ onClose }) => {
   const fileInputRef = useRef(null);
   const backupInputRef = useRef(null);
 
-  // Handle Login
+  // Security & Brute-Force Protection
+  const [failedAttempts, setFailedAttempts] = useState(() => {
+    try {
+      return Number(localStorage.getItem('sse_admin_fails') || 0);
+    } catch { return 0; }
+  });
+  const [lockoutTime, setLockoutTime] = useState(() => {
+    try {
+      return Number(localStorage.getItem('sse_admin_lockout') || 0);
+    } catch { return 0; }
+  });
+  const [showPin, setShowPin] = useState(false);
+
+  // Handle Login with Rate Limiting
   const handleLogin = (e) => {
     e.preventDefault();
-    loginAdmin(pinInput);
+    if (lockoutTime > Date.now()) {
+      const remainingMins = Math.ceil((lockoutTime - Date.now()) / 60000);
+      showToast(`⛔ Too many attempts. Portal locked for ${remainingMins} more minutes.`, 'error');
+      return;
+    }
+
+    const success = loginAdmin(pinInput);
+    if (success) {
+      setFailedAttempts(0);
+      try {
+        localStorage.removeItem('sse_admin_fails');
+        localStorage.removeItem('sse_admin_lockout');
+      } catch {}
+    } else {
+      const nextFails = failedAttempts + 1;
+      setFailedAttempts(nextFails);
+      try {
+        localStorage.setItem('sse_admin_fails', String(nextFails));
+      } catch {}
+      if (nextFails >= 5) {
+        const lockout = Date.now() + 10 * 60 * 1000; // 10 minutes lockout
+        setLockoutTime(lockout);
+        try {
+          localStorage.setItem('sse_admin_lockout', String(lockout));
+        } catch {}
+        showToast('⛔ 5 failed attempts! Portal locked for 10 minutes.', 'error');
+      }
+    }
   };
 
   // Open Form for Adding
@@ -312,23 +352,41 @@ export const AdminPortal = ({ onClose }) => {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
-              <div>
+              <div className="relative">
                 <input
-                  type="password"
+                  type={showPin ? "text" : "password"}
                   value={pinInput}
                   onChange={(e) => setPinInput(e.target.value)}
-                  placeholder="Enter PIN (Default: 1234)"
+                  placeholder="Enter Manager Security PIN"
                   autoFocus
-                  className="w-full text-center tracking-widest text-lg font-bold py-3 px-4 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50"
+                  disabled={lockoutTime > Date.now()}
+                  className="w-full text-center tracking-widest text-lg font-bold py-3 px-10 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 disabled:bg-slate-200 disabled:cursor-not-allowed"
                 />
-                <span className="text-[11px] text-slate-400 block mt-1.5">
-                  Default PIN is: <strong className="text-slate-700">1234</strong> (can be changed in settings)
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowPin(!showPin)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
               </div>
+
+              {failedAttempts > 0 && failedAttempts < 5 && (
+                <span className="text-[11px] text-rose-600 font-semibold block">
+                  ⚠️ {5 - failedAttempts} attempts remaining before temporary lockout.
+                </span>
+              )}
+
+              {lockoutTime > Date.now() && (
+                <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold">
+                  ⛔ Locked for security due to multiple failed tries. Please wait before trying again.
+                </div>
+              )}
 
               <button
                 type="submit"
-                className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md transition-all cursor-pointer"
+                disabled={lockoutTime > Date.now()}
+                className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-400 text-white font-bold text-sm shadow-md transition-all cursor-pointer"
               >
                 Unlock Management Portal
               </button>
