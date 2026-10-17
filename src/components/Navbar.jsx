@@ -13,23 +13,24 @@ import {
   FileText, 
   Layers,
   MapPin,
-  Clock
+  Clock,
+  Languages
 } from 'lucide-react';
 
 export const Navbar = ({ onOpenAdmin, onOpenQuoteDrawer, onOpenRateSheet }) => {
-  const { settings, cart, formatWhatsAppUrl, isAdminLoggedIn } = useStore();
+  const { settings, cart, formatWhatsAppUrl, isAdminLoggedIn, language, setLanguage, t } = useStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const cartItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const navLinks = [
-    { label: 'Products', href: '#products' },
-    { label: 'Solar Packages', href: '#packages' },
-    { label: 'Solar Calculator', href: '#calculator', badge: 'Popular' },
-    { label: "Today's Rates", onClick: onOpenRateSheet, isAction: true },
-    { label: 'Projects', href: '#projects' },
-    { label: 'Why Choose Us', href: '#why-us' },
-    { label: 'Contact', href: '#contact' },
+    { label: t('navProducts'), href: '#products' },
+    { label: t('navPackages'), href: '#packages' },
+    { label: t('navCalculator'), href: '#calculator', badge: 'Popular' },
+    { label: t('navRates'), onClick: onOpenRateSheet, isAction: true },
+    { label: t('navProjects'), href: '#projects' },
+    { label: t('navWhyUs'), href: '#why-us' },
+    { label: t('navContact'), href: '#contact' },
   ];
 
   return (
@@ -47,14 +48,38 @@ export const Navbar = ({ onOpenAdmin, onOpenQuoteDrawer, onOpenRateSheet }) => {
             </p>
           </div>
 
-          {/* Quick contact header links */}
-          <div className="flex items-center gap-4 text-xs shrink-0">
+          {/* Quick contact header links & Language Switcher */}
+          <div className="flex items-center gap-3 sm:gap-4 text-xs shrink-0">
+            {/* Language Switcher */}
+            <div className="flex items-center bg-slate-800/90 rounded-lg p-0.5 border border-slate-700">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${
+                  language === 'en'
+                    ? 'bg-amber-400 text-slate-950 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLanguage('ur')}
+                className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer font-sans ${
+                  language === 'ur'
+                    ? 'bg-emerald-500 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                اردو
+              </button>
+            </div>
+
             <a
               href={`tel:${settings.phone}`}
               className="flex items-center gap-1.5 hover:text-amber-400 transition-colors font-medium"
             >
               <Phone className="w-3.5 h-3.5 text-amber-400" />
-              <span>{settings.phone}</span>
+              <span className="hidden sm:inline">{settings.phone}</span>
             </a>
             <span className="text-slate-600 hidden sm:inline">|</span>
             <a
@@ -64,7 +89,7 @@ export const Navbar = ({ onOpenAdmin, onOpenQuoteDrawer, onOpenRateSheet }) => {
               className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
             >
               <MessageCircle className="w-3.5 h-3.5" />
-              <span>WhatsApp Direct</span>
+              <span>{t('directWhatsApp')}</span>
             </a>
           </div>
         </div>

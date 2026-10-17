@@ -10,11 +10,12 @@ import {
   ArrowRight,
   ShieldCheck,
   MapPin,
-  User
+  User,
+  FileText
 } from 'lucide-react';
 
 export const QuoteDrawer = ({ isOpen, onClose }) => {
-  const { cart, settings, updateCartQty, removeFromCart, clearCart, getCartQuoteWhatsAppLink } = useStore();
+  const { cart, settings, updateCartQty, removeFromCart, clearCart, getCartQuoteWhatsAppLink, setOfficialQuoteData } = useStore();
 
   const [customerName, setCustomerName] = useState('');
   const [customerCity, setCustomerCity] = useState('');
@@ -219,6 +220,30 @@ export const QuoteDrawer = ({ isOpen, onClose }) => {
                 <MessageCircle className="w-4 h-4 fill-white" />
                 <span>Send Complete Quote to WhatsApp</span>
               </a>
+
+              {/* View / Print Official PDF Quote Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setOfficialQuoteData({
+                    customerName: customerName.trim() || 'Valued Client',
+                    customerCity: customerCity.trim() || 'Site Address',
+                    items: cart.map(item => ({
+                      name: item.name,
+                      brand: item.brand,
+                      price: item.price,
+                      quantity: item.quantity,
+                      unit: item.unit
+                    })),
+                    totalPrice: totalAmount
+                  });
+                  onClose();
+                }}
+                className="w-full py-2.5 px-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <FileText className="w-4 h-4 text-emerald-600" />
+                <span>📄 View / Print Official PDF Quotation</span>
+              </button>
 
               <p className="text-[11px] text-center text-slate-400">
                 Instantly forwards this complete itemized list to {settings.shopName}'s WhatsApp for final discount & stock dispatch.

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DEFAULT_STORE_SETTINGS, INITIAL_PRODUCTS } from '../data/initialData';
+import { TRANSLATIONS } from '../data/translations';
 
 const StoreContext = createContext();
 
@@ -7,8 +8,30 @@ const PRODUCTS_STORAGE_KEY = 'star_solar_products_v1';
 const SETTINGS_STORAGE_KEY = 'star_solar_settings_v1';
 const CART_STORAGE_KEY = 'star_solar_cart_v1';
 const ADMIN_AUTH_KEY = 'star_solar_admin_session_v1';
+const LANG_STORAGE_KEY = 'star_solar_lang_v1';
 
 export const StoreProvider = ({ children }) => {
+  // Language state (en or ur)
+  const [language, setLanguageState] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LANG_STORAGE_KEY);
+      if (saved === 'ur' || saved === 'en') return saved;
+    } catch (e) {}
+    return 'en';
+  });
+
+  const setLanguage = (lang) => {
+    setLanguageState(lang);
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch (e) {}
+  };
+
+  // Translation helper
+  const t = (key) => {
+    return TRANSLATIONS[language]?.[key] || TRANSLATIONS['en']?.[key] || key;
+  };
+
   // Products state
   const [products, setProducts] = useState(() => {
     try {
@@ -54,6 +77,9 @@ export const StoreProvider = ({ children }) => {
 
   // Quick Toast notification state
   const [toast, setToast] = useState(null);
+
+  // Official Printable Quote Modal state
+  const [officialQuoteData, setOfficialQuoteData] = useState(null);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type, id: Date.now() });
@@ -243,7 +269,21 @@ export const StoreProvider = ({ children }) => {
 
   const getProductWhatsAppLink = (product) => {
     const formattedPrice = `${settings.currencySymbol} ${product.price.toLocaleString()}`;
-    const msg = `☀️ *Hello StarSolarEnergy!* 
+    const isUrdu = language === 'ur';
+
+    const msg = isUrdu
+      ? `☀️ *السلام علیکم StarSolarEnergy!* 
+میں آپ کی ویب سائٹ سے اس پراڈکٹ کے بارے میں معلومات اور ریٹ لینا چاہتا ہوں:
+
+📦 *پراڈکٹ:* ${product.name}
+🏷️ *برانڈ:* ${product.brand}
+💰 *لسٹڈ ریٹ:* ${formattedPrice} ${product.unit ? `(${product.unit})` : ''}
+${product.badge ? `⭐ *کیٹیگری:* ${product.badge}` : ''}
+
+برائے مہربانی موجودہ اسٹاک، بہترین ہول سیل ڈسکاؤنٹ اور ڈلیوری کی تفصیلات شیئر فرمائیں۔
+
+شکریہ!`
+      : `☀️ *Hello StarSolarEnergy!* 
 I am interested in buying / getting details for this product:
 
 📦 *Product:* ${product.name}
@@ -254,18 +294,40 @@ ${product.badge ? `⭐ *Type:* ${product.badge}` : ''}
 Could you please confirm current stock availability, best wholesale discount, and delivery time to my location?
 
 Thank you!`;
+
     return formatWhatsAppUrl(msg);
   };
 
   const getGeneralInquiryWhatsAppLink = (topic = 'General Inquiry') => {
-    const msg = `☀️ *Hello StarSolarEnergy Team!* 
+    const isUrdu = language === 'ur';
+    const msg = isUrdu
+      ? `☀️ *السلام علیکم StarSolarEnergy!* 
+میں سولر پینلز اور انورٹرز کے بارے میں رہنمائی اور کوٹیشن لینا چاہتا ہوں۔ برائے مہربانی رابطہ فرمائیں۔`
+      : `☀️ *Hello StarSolarEnergy Team!* 
 I visited your website and would like to inquire about *${topic}*. 
 Please connect me with the owner / solar specialist for consultation and quotation.`;
     return formatWhatsAppUrl(msg);
   };
 
   const getSolarCalculatorWhatsAppLink = (calcDetails) => {
-    const msg = `☀️ *SOLAR SYSTEM ESTIMATION INQUIRY*
+    const isUrdu = language === 'ur';
+    const msg = isUrdu
+      ? `☀️ *سولر سسٹم کیلکولیشن کوٹیشن*
+*ویب سائٹ:* StarSolarEnergy آن لائن کیلکولیٹر
+
+⚡ *تجویز کردہ سسٹم:* ${calcDetails.recommendedKW} kW System
+☀️ *سولر پینلز:* ~${calcDetails.panelsCount} Panels (${calcDetails.panelWattage}W each)
+⚡ *انورٹر سائز:* ${calcDetails.inverterSize}
+🔋 *بیٹری بیک اپ:* ${calcDetails.batteryRecommendation}
+💡 *روزانہ پیداوار:* ~${calcDetails.dailyUnits} Units/Day
+💵 *ماہانہ بل کی متوقع بچت:* ${settings.currencySymbol} ${calcDetails.monthlySavings?.toLocaleString()}
+
+📝 *لوڈ کی تفصیل:*
+- ماہانہ یونٹس/بل: ${calcDetails.inputSummary}
+${calcDetails.appliancesSummary ? `- منتخب کردہ سامان: ${calcDetails.appliancesSummary}` : ''}
+
+براہ کرم مکمل انسٹالیشن، اسٹرکچر اور نیٹ میٹرنگ کے ساتھ فائنل کوٹیشن شیئر کریں۔ شکریہ!`
+      : `☀️ *SOLAR SYSTEM ESTIMATION INQUIRY*
 *From:* StarSolarEnergy Website Calculator
 
 ⚡ *System Estimated:* ${calcDetails.recommendedKW} kW System
@@ -314,7 +376,12 @@ Please provide final wholesale price quotation, delivery cost, and installation 
         settings,
         cart,
         toast,
+        language,
+        officialQuoteData,
         isAdminLoggedIn,
+        setLanguage,
+        t,
+        setOfficialQuoteData,
         addProduct,
         updateProduct,
         deleteProduct,

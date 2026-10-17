@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 
 export const SolarCalculator = () => {
-  const { settings, getSolarCalculatorWhatsAppLink } = useStore();
+  const { settings, getSolarCalculatorWhatsAppLink, t, language, setOfficialQuoteData } = useStore();
 
   const [calculationMode, setCalculationMode] = useState('units'); // 'units' or 'appliances'
 
@@ -501,19 +501,62 @@ export const SolarCalculator = () => {
               </div>
             </div>
 
-            {/* SEND DIRECTLY TO WHATSAPP BUTTON */}
-            <div className="mt-6 pt-4 border-t border-slate-800">
+            {/* ACTION BUTTONS: WHATSAPP + OFFICIAL PRINTABLE PROPOSAL */}
+            <div className="mt-6 pt-4 border-t border-slate-800 space-y-2.5">
               <a
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 py-4 px-4 rounded-2xl font-bold text-sm sm:text-base text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 shadow-xl shadow-emerald-700/30 transition-all cursor-pointer group"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl font-bold text-sm sm:text-base text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 shadow-xl shadow-emerald-700/30 transition-all cursor-pointer group"
               >
                 <MessageCircle className="w-5 h-5 fill-white group-hover:scale-110 transition-transform" />
-                <span>Send My Solar Calculation to WhatsApp</span>
+                <span>{t('calcSendWhatsApp')}</span>
               </a>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setOfficialQuoteData({
+                    title: `${results.recommendedKW} kW Turnkey Solar System`,
+                    totalPrice: results.recommendedKW * 140000,
+                    customerName: 'Solar Client',
+                    customerCity: 'Property Rooftop',
+                    items: [
+                      {
+                        name: `${results.panelsCount}x ${results.panelWattage}W Tier-1 N-Type Solar Panels`,
+                        brand: 'Longi / Jinko Solar',
+                        price: results.panelsCount * 34500,
+                        quantity: 1
+                      },
+                      {
+                        name: results.inverterSize,
+                        brand: 'Deye / Inverex / Growatt',
+                        price: results.recommendedKW >= 10 ? 460000 : 245000,
+                        quantity: 1
+                      },
+                      {
+                        name: results.batteryRecommendation,
+                        brand: 'Narada / Phoenix',
+                        price: results.recommendedKW >= 5 ? 330000 : 116000,
+                        quantity: 1
+                      },
+                      {
+                        name: 'L2/L3 Galvanized Mounting Structure, Pure Copper DC/AC Cables, SPDs & Earthing',
+                        brand: 'StarSolar Turnkey',
+                        price: 95000,
+                        quantity: 1
+                      }
+                    ]
+                  });
+                }}
+                className="w-full py-3 px-4 rounded-2xl font-bold text-xs sm:text-sm text-slate-200 bg-slate-800 hover:bg-slate-700 hover:text-white border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <FileText className="w-4 h-4 text-amber-400" />
+                <span>📄 Generate Official Printable Proposal / Quote (PDF)</span>
+              </button>
+
               <p className="text-center text-[11px] text-slate-400 mt-2">
-                Clicking opens WhatsApp with this exact {results.recommendedKW} kW breakdown pre-filled for an instant turnkey quote from the owner.
+                {t('calcDisclaimer')}
               </p>
             </div>
 

@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const Hero = ({ onOpenRateSheet }) => {
-  const { settings, formatWhatsAppUrl } = useStore();
+  const { settings, formatWhatsAppUrl, t, language } = useStore();
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-navy-950 text-white py-16 sm:py-24 lg:py-28">
@@ -34,21 +34,21 @@ export const Hero = ({ onOpenRateSheet }) => {
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-emerald-500/30 text-emerald-300 text-xs sm:text-sm font-semibold backdrop-blur-md shadow-inner">
               <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
               <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Official Solar Panels & Hybrid Inverter Stock</span>
+              <span>{t('heroBadge')}</span>
             </div>
 
             {/* Main Headline */}
             <h1 className="font-heading font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.15] text-white">
-              Slash Your Electricity Bills to{' '}
+              {t('heroTitlePrefix')}{' '}
               <span className="bg-gradient-to-r from-amber-400 via-yellow-300 to-emerald-400 bg-clip-text text-transparent underline decoration-amber-500/40 decoration-wavy">
-                ZERO
+                {t('heroTitleHighlight')}
               </span>{' '}
-              with StarSolarEnergy.
+              {t('heroTitleSuffix')}
             </h1>
 
             {/* Subtitle */}
             <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
-              Wholesale & retail supplier of genuine <strong className="text-white font-semibold">Tier-1 Solar Panels</strong> (Longi, Jinko, Canadian), high-performance <strong className="text-white font-semibold">Hybrid Inverters</strong> (Deye, Growatt, Inverex), and durable <strong className="text-white font-semibold">Lithium & Tubular Batteries</strong> with guaranteed warranty and turnkey net-metering.
+              {t('heroSubtitle')}
             </p>
 
             {/* Call to Actions */}
@@ -57,7 +57,7 @@ export const Hero = ({ onOpenRateSheet }) => {
                 href="#products"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-xl font-bold text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 shadow-lg shadow-amber-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
               >
-                <span>View Products & Prices</span>
+                <span>{t('heroCtaProducts')}</span>
                 <ArrowRight className="w-5 h-5 text-slate-950" />
               </a>
 
@@ -68,14 +68,14 @@ export const Hero = ({ onOpenRateSheet }) => {
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl font-bold text-white bg-emerald-600/90 hover:bg-emerald-500 border border-emerald-400/40 shadow-lg shadow-emerald-700/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
               >
                 <MessageCircle className="w-5 h-5 fill-white" />
-                <span>1-Click WhatsApp Inquire</span>
+                <span>{t('heroCtaWhatsApp')}</span>
               </a>
 
               <button
                 onClick={onOpenRateSheet}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/90 border border-slate-700 transition-colors"
               >
-                <span>Today's Rate Sheet</span>
+                <span>{t('heroCtaRates')}</span>
               </button>
             </div>
 
@@ -83,19 +83,19 @@ export const Hero = ({ onOpenRateSheet }) => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-800/80">
               <div className="flex items-center gap-2 text-left">
                 <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span className="text-xs text-slate-300 font-medium">100% Genuine Tier-1 Panels</span>
+                <span className="text-xs text-slate-300 font-medium">{t('heroTrust1')}</span>
               </div>
               <div className="flex items-center gap-2 text-left">
                 <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span className="text-xs text-slate-300 font-medium">25-Year Linear Warranty</span>
+                <span className="text-xs text-slate-300 font-medium">{t('heroTrust2')}</span>
               </div>
               <div className="flex items-center gap-2 text-left">
                 <Zap className="w-5 h-5 text-amber-400 shrink-0" />
-                <span className="text-xs text-slate-300 font-medium">Net-Metering Ready</span>
+                <span className="text-xs text-slate-300 font-medium">{t('heroTrust3')}</span>
               </div>
               <div className="flex items-center gap-2 text-left">
                 <Award className="w-5 h-5 text-amber-400 shrink-0" />
-                <span className="text-xs text-slate-300 font-medium">Free Engineering Survey</span>
+                <span className="text-xs text-slate-300 font-medium">{t('heroTrust4')}</span>
               </div>
             </div>
 

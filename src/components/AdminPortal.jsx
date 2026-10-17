@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useStore } from '../context/StoreContext';
 import { CATEGORIES } from '../data/initialData';
+import { compressImageFile } from '../utils/imageCompressor';
 import { 
   X, 
   Lock, 
@@ -147,23 +148,33 @@ export const AdminPortal = ({ onClose }) => {
     setFormData({ ...formData, specs: updated });
   };
 
-  // Handle Local Image Upload (converts to base64 data URI)
-  const handleImageFileUpload = (e) => {
+  // Handle Local Image Upload with Automatic Smart Canvas Compression
+  const [compressionInfo, setCompressionInfo] = useState(null);
+
+  const handleImageFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 3 * 1024 * 1024) {
-        showToast('⚠️ Image file is over 3MB. Please choose a smaller photo.', 'error');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (uploadEvent) => {
+      try {
+        showToast('⏳ Compressing & optimizing photo...');
+        const result = await compressImageFile(file, 1200, 1200, 0.82);
         setFormData((prev) => ({
           ...prev,
-          image: uploadEvent.target.result
+          image: result.dataUrl
         }));
-        showToast('📸 Image uploaded successfully!');
-      };
-      reader.readAsDataURL(file);
+        setCompressionInfo(result);
+        showToast(`📸 Photo optimized: ${result.originalSizeKB}KB ➔ ${result.compressedSizeKB}KB (${result.savedPercent}% smaller)!`);
+      } catch (err) {
+        // Fallback to standard reader if compression fails
+        const reader = new FileReader();
+        reader.onload = (uploadEvent) => {
+          setFormData((prev) => ({
+            ...prev,
+            image: uploadEvent.target.result
+          }));
+          showToast('📸 Photo uploaded successfully!');
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -875,13 +886,23 @@ export const AdminPortal = ({ onClose }) => {
                 />
 
                 {formData.image && (
-                  <div className="mt-2 flex items-center gap-3">
-                    <img
-                      src={formData.image}
-                      alt="Preview"
-                      className="w-16 h-12 object-cover rounded-lg border border-slate-200"
-                    />
-                    <span className="text-[11px] text-slate-500">Image Preview Ready</span>
+                  <div className="mt-2 flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={formData.image}
+                        alt="Preview"
+                        className="w-14 h-11 object-cover rounded-lg border border-slate-200"
+                      />
+                      <div>
+                        <span className="text-[11px] font-bold text-slate-800 block">Photo Ready</span>
+                        <span className="text-[10px] text-slate-400">Optimized for fast mobile loading</span>
+                      </div>
+                    </div>
+                    {compressionInfo && (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                        {compressionInfo.originalSizeKB}KB ➔ {compressionInfo.compressedSizeKB}KB ({compressionInfo.savedPercent}% saved)
+                      </span>
+                    )}
                   </div>
                 )}
               </div>

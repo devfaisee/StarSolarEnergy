@@ -14,11 +14,13 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { AdminPortal } from './components/AdminPortal';
 import { QuoteDrawer } from './components/QuoteDrawer';
+import { OfficialQuoteModal } from './components/OfficialQuoteModal';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { MobileBottomBar } from './components/MobileBottomBar';
 import { Toast } from './components/Toast';
 
 export function App() {
+  const { officialQuoteData, setOfficialQuoteData } = useStore();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isRateSheetOpen, setIsRateSheetOpen] = useState(false);
@@ -98,6 +100,14 @@ export function App() {
         isOpen={isQuoteDrawerOpen}
         onClose={() => setIsQuoteDrawerOpen(false)}
       />
+
+      {/* Official Turnkey Printable Proposal / Quote Modal */}
+      {officialQuoteData && (
+        <OfficialQuoteModal
+          quoteData={officialQuoteData}
+          onClose={() => setOfficialQuoteData(null)}
+        />
+      )}
     </div>
   );
 }
